@@ -1,0 +1,38 @@
+version: '3.1'
+
+services:
+  
+  pixel:
+    container_name: pixel-service
+    build:
+      context: ./PixelService
+      dockerfile: Dockerfile
+    ports:
+      - "5006:80"
+    environment:
+      - ConnectionStrings__EventBus=rabbitmq
+      - EventBus__SubscriptionClientName=Pixel
+      - EventBus__RetryCount=5
+      - EventBus__UserName=guest
+      - EventBus__Password
+        
+  store:
+    container_name: store-service
+    build:
+      context: ./StoreService
+      dockerfile: Dockerfile
+    ports:
+      - "5005:80"
+    environment:
+      - ConnectionStrings__EventBus=rabbitmq
+      - EventBus__SubscriptionClientName=Store
+      - EventBus__RetryCount=5
+      - EventBus__UserName=guest
+      - EventBus__Password=guest
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
